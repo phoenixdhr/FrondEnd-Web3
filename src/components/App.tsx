@@ -1,12 +1,13 @@
+
 import React from "react";
 
 import { configureChains} from 'wagmi'
 import { WagmiConfig, createClient } from "wagmi";
 import { ConnectKitProvider, ConnectKitButton, getDefaultClient } from "connectkit";
-import { mainnet,goerli, polygon, optimism } from 'wagmi/chains'
+import { mainnet,goerli, polygon, optimism, sepolia } from 'wagmi/chains'
 import { publicProvider } from 'wagmi/providers/public'
 
-const {chains, provider} = configureChains([goerli, polygon, mainnet, optimism], [publicProvider()])
+const {chains, provider} = configureChains([sepolia, goerli, polygon, mainnet, optimism], [publicProvider()])
 
 // const alchemyId = process.env.ALCHEMY_ID;
 

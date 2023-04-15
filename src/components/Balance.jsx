@@ -5,12 +5,13 @@ import { useAccount } from "wagmi";
 import { ethers } from "ethers";
 
 // Make sure that this component is wrapped with ConnectKitProvider
-const Mycomponent = () => {
+const Balance = () => {
 
   const { address, status } =  useAccount();
-  const [_address, setAddress] = useState()
-  const [_status,  setStatus] = useState()
-  const [_balance, setBalance] =useState()
+  const [_address, setAddress] = useState(address)
+  const [_status,  setStatus] = useState(status)
+  const [_balance, setBalance] =useState(0)
+
 
 
   useEffect(() => {      
@@ -25,20 +26,20 @@ const Mycomponent = () => {
         setBalance(balanceFormat)
     }
 
-    balance()
+    if (address) {balance()}    
+
+
     }, [status, address]) 
 
 
   if (_status!="connected") 
   {return (<div> {_status}</div>);}
 
-  console.log("_ballance => ",_balance);
-  console.log("address => ", _address, typeof(_address));
 
   return (<div>
-    <div> Connected Wallet:  {address.slice(0,6) + "..." +address.slice(38,42) } </div>
+    {/* <div> Connected Wallet:  {address? "" : address.slice(0,6) + "..." +address.slice(38,42) } </div> */}
     <div> Balance:  {_balance} </div>
   </div>);
 };
 
-export default Mycomponent
+export default Balance

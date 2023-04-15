@@ -1,20 +1,28 @@
 import React from "react";
-import App from "@/components/App";
-import Mycomponent from "@/components/Mycomponent"
+import Balance from "@/components/Balance"
+import MaxSupply from "@/components/MaxSupply";
+import Home from "@/components/Home";
+import { ChakraProvider } from "@chakra-ui/react";
 
+import MainLayout from "../layouts/main"
 
-function Home() {
+function Principal() {
 
   return(
-  <div>
-    <Mycomponent/>
-
-    <App></App>
-    
-  </div>
+  
+    <ChakraProvider>
+      <MainLayout>
+      <Balance/>   
+      <MaxSupply/>
+      <Home/>
+      </MainLayout>
+      
+    </ChakraProvider>
+     
+  
   )
 }
 
 
-export default Home
+export default Principal
 
