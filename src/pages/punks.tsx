@@ -11,6 +11,7 @@ import AbiAddress_NFTpunks from "@/hooks/useNFTpunks/artifacts/AbiAddress_NFTpun
 import { useProvider } from "wagmi";
 import PunkCard from "@/components2/punk-card/punk-card";
 import { Grid } from '@chakra-ui/react'
+import Link from "next/link";
 
 function Punks() {
   const { abi, addressContract } = AbiAddress_NFTpunks;
@@ -20,12 +21,7 @@ function Punks() {
   const [_dataApi, set_dataApi] = useState([]);
 
   async function main() {
-    //const provider = new ethers.providers.Web3Provider(window.ethereum)
-    const contractNFT = new ethers.Contract(
-      addressContract.sepolia1,
-      abi,
-      provider
-    );
+    const contractNFT = new ethers.Contract(addressContract.sepolia1,abi,provider);
 
     const totalSupply = Number(await contractNFT.totalSupply());
     console.log("totalSupply =>", totalSupply);
@@ -66,7 +62,12 @@ function Punks() {
         <> status: {status} </>
         <>_status: {_status}</>
         <Grid templateColumns='repeat(auto-fill, minmax(250px,1fr))' gap={6}>
-        {status=="connected"? _dataApi.map((Element)=>(<PunkCard key={Element.tokenID} imagen={Element.imagen} name={Element.name}></PunkCard>)):""}
+        {status=="connected"? _dataApi.map((Element)=>(
+          <Link key={Element.tokenID} href={`/punks/${Element.tokenID}`}>
+            <PunkCard  imagen={Element.imagen} name={Element.name}></PunkCard>
+          </Link>
+        )):""
+        }
           </Grid>
       </MainLayout>
     </ChakraProvider>

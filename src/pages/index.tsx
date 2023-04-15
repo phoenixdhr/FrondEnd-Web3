@@ -5,8 +5,11 @@ import Home from "@/components/Home";
 import { ChakraProvider } from "@chakra-ui/react";
 
 import MainLayout from "../layouts/main"
+import { useCounter } from "@/hooks/useCounter";
+
 
 function Principal() {
+  const {_count, increment, decrement}= useCounter(10)
 
   return(
   
@@ -16,7 +19,11 @@ function Principal() {
       <MaxSupply/>
       <Home/>
       </MainLayout>
-      
+      <button onClick={increment}>increment </button>
+        <button onClick={decrement}> decrement</button>
+        <h1>{_count}</h1>
+
+
     </ChakraProvider>
      
   
