@@ -20,168 +20,214 @@ import { useProvider } from "wagmi";
 import { useState, useEffect } from "react";
 import AbiAddress_NFTpunks from "@/hooks/useNFTpunks/artifacts/AbiAddress_NFTpunks";
 import { ethers } from "ethers";
-import MainLayout from "@/layouts/main";
+import MainLayout from "@/layouts/main/mainLayout";
 import { ChakraProvider } from "@chakra-ui/react";
-
-
-
+import { useToast } from "@chakra-ui/react";
 
 const Punk = () => {
-
   const { status, address } = useAccount();
   const { abi, addressContract } = AbiAddress_NFTpunks;
 
-  
   const [_status, set_status] = useState(status || "not connected");
   const [_IDataNFT, set_IDataNFT] = useState({});
-  
-  const [_owner, set_owner] = useState("")
-  const [_ADN, set_ADN] = useState("")
-  const [_atributos, set_atributos] = useState([])
-  
-  const router =useRouter()
-  const provider = useProvider();
 
+  const [_owner, set_owner] = useState("");
+  const [_ADN, set_ADN] = useState("");
+  const [_atributos, set_atributos] = useState([]);
 
-  
+  const [refreshData, set_refreshData] = useState(false);
+
+  const router = useRouter();
+  const toast = useToast();
 
   async function main(tokenId: number) {
-    
-    const contractNFT = new ethers.Contract(addressContract.sepolia1,abi,provider);
-    
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const contractNFT = new ethers.Contract(
+      addressContract.sepolia1,
+      abi,
+      provider
+    );
+
     const totalSupply = Number(await contractNFT.totalSupply());
     console.log("totalSupply =>", totalSupply);
 
     if (totalSupply >= tokenId) {
+      const owner = await contractNFT.ownerOf(tokenId);
+      set_owner(owner);
 
-                    const owner = await contractNFT.ownerOf(tokenId)
-                    set_owner(owner)
+      const ADN = await contractNFT.tokenID_to_ADN(tokenId);
+      set_ADN(BigInt(ADN).toString(10));
 
-                    const ADN = await contractNFT.tokenID_to_ADN(tokenId)                  
-                    set_ADN(BigInt(ADN).toString(10))
+      const base64URL = await contractNFT.tokenURI(tokenId);
 
-                    const base64URL = await contractNFT.tokenURI(tokenId);
+      const base64 = base64URL.split(",")[1];
+      const dataNFT = atob(base64);
+      const dataNFTjs = JSON.parse(dataNFT);
+      set_IDataNFT(dataNFTjs);
 
-                    const base64 = base64URL.split(",")[1];
-                    const dataNFT = atob(base64);
-                    const dataNFTjs = JSON.parse(dataNFT);
-                    set_IDataNFT(dataNFTjs);
+      const URLimage = dataNFTjs.image;
 
-                    const URLimagen = dataNFTjs.imagen
-                    
-                    const efe="sdfsf"
-                    efe.substring(0,2)
-                    const stringAtributos = URLimagen.slice(22).split("&")
-                    console.log("atributor  ==>", stringAtributos );
-                    // set_atributos
+      const efe = "sdfsf";
+      efe.substring(0, 2);
+      const stringAtributos = URLimage.slice(22).split("&");
+      console.log("atributor  ==>", stringAtributos);
+      // set_atributos
 
-                    const arrayDeAtributos: { [key: string]: string }[] = stringAtributos.map((elemento: string) => {
-                      const [clave, valor] = elemento.split("=")
-                      return { [clave]: valor }
-                    })
-                    set_atributos(arrayDeAtributos)
-
-                    console.log("arrayDeObjetos  ", arrayDeAtributos);
-                    
-                    
-
+      const arrayDeAtributos: { [key: string]: string }[] = stringAtributos.map(
+        (elemento: string) => {
+          const [clave, valor] = elemento.split("=");
+          return { [clave]: valor };
         }
-        console.log("_IDataNFT =====>",_IDataNFT);
-        console.log("_IDataNFT =====>",_IDataNFT.imagen);
-        
+      );
+      set_atributos(arrayDeAtributos);
+
+      console.log("arrayDeObjetos  ", arrayDeAtributos);
+    }
+
+    console.log("_IDataNFT =====>", _IDataNFT);
+    console.log("_IDataNFT =====>", _IDataNFT.image);
   }
 
+  useEffect(() => {
+    const id = router.query.id;
+    const tokenId = Number(id);
 
+    main(tokenId);
 
-    
-    useEffect(()=>{
-        const id = router.query.id
-        const tokenId = Number(id)
-      
-        main(tokenId);
-       
-        set_status(status || "not connected");
-    },[, status])
+    set_status(status || "not connected");
+  }, [, status]);
 
+  async function transfer() {
+    try {
+      const id = router.query.id;
+      const tokenId = Number(id);
+      const to = prompt("ingresa un address de destino");
 
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
 
+      const contractNFT = new ethers.Contract(
+        addressContract.sepolia1,
+        abi,
+        signer
+      );
 
+      const tx = await contractNFT["safeTransferFrom(address,address,uint256)"](
+        address,
+        to,
+        tokenId
+      );
 
+      toast({
+        title: `Enviando  NFT `,
+        description: `txHash ${tx.hash}`,
+        status: "info",
+        duration: 2000,
+        isClosable: true,
+      });
 
-//   const { loading, punk } = usePlatziPunkData(tokenId);
+      await tx.wait();
 
- 
+      toast({
+        title: `El NFT se envió con éxito`,
+        description: `el NFT con Tokenid ${id} se envió a ${to}`,
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: `${error.code}`,
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
+  }
 
-//   if (loading) return <Loading />;
+  useEffect(() => {
+    if (router.isReady) {
+      // 2. Efecto para actualizar el estado de _dataApi
+      set_refreshData(true);
+    }
+  }, [router]);
+
+  useEffect(() => {
+    if (refreshData) {
+      set_refreshData(false);
+      const id = router.query.id;
+      const tokenId = Number(id);
+
+      main(tokenId);
+    }
+  }, [refreshData]);
 
   return (
     <ChakraProvider>
-        <MainLayout>
-            hola
-            {status !== "connected" ? <RequestAccess /> : ""}
-
-
-    <Stack
-      spacing={{ base: 8, md: 10 }}
-      py={{ base: 5 }}
-      direction={{ base: "column", md: "row" }}
-    >
-      <Stack>
-        <PunkCard
-          mx={{
-            base: "auto",
-            md: 0,
-          }}
-          name={_IDataNFT.name}
-          imagen={_IDataNFT.imagen}
-        />
-        <Button disabled={address !== _owner} colorScheme="green">
-          {address !== _owner ? "No eres el dueño" : "Transferir"}
-        </Button>
-      </Stack>
-      <Stack width="100%" spacing={5}>
-        <Heading>{_IDataNFT.name}</Heading>
-        <Text fontSize="xl">{_IDataNFT.description}</Text>
-        <Text fontWeight={600}>
-          DNA:
-          <Tag ml={2} colorScheme="green">
-            {_ADN}
-          </Tag>
-        </Text>
-        <Text fontWeight={600}>
-          Owner:
-          <Tag ml={2} colorScheme="green">
-            {_owner}
-          </Tag>
-        </Text>
-        <Table size="sm" variant="simple">
-          <Thead>
-            <Tr>
-              <Th>Atributo</Th>
-              <Th>Valor</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {_atributos.map((elemento) => (
-              <Tr key={Object.keys(elemento)[0]}>
-                <Td>{Object.keys(elemento)[0]}</Td>
-                <Td>
-                  <Tag>{Object.values(elemento)[0]}</Tag>
-                </Td>
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
-      </Stack>
-    </Stack>
-
-
-
-        </MainLayout>
+      <MainLayout>
+        hola
+        {status !== "connected" ? <RequestAccess /> : ""}
+        <Stack
+          spacing={{ base: 8, md: 10 }}
+          py={{ base: 5 }}
+          direction={{ base: "column", md: "row" }}
+        >
+          <Stack>
+            <PunkCard
+              mx={{
+                base: "auto",
+                md: 0,
+              }}
+              name={_IDataNFT.name}
+              image={_IDataNFT.image}
+            />
+            <Button
+              disabled={address !== _owner}
+              colorScheme="green"
+              onClick={transfer}
+            >
+              {address !== _owner ? "No eres el dueño" : "Transferir"}
+            </Button>
+          </Stack>
+          <Stack width="100%" spacing={5}>
+            <Heading>{_IDataNFT.name}</Heading>
+            <Text fontSize="xl">{_IDataNFT.description}</Text>
+            <Text fontWeight={600}>
+              DNA:
+              <Tag ml={2} colorScheme="green">
+                {_ADN}
+              </Tag>
+            </Text>
+            <Text fontWeight={600}>
+              Owner:
+              <Tag ml={2} colorScheme="green">
+                {_owner}
+              </Tag>
+            </Text>
+            <Table size="sm" variant="simple">
+              <Thead>
+                <Tr>
+                  <Th>Atributo</Th>
+                  <Th>Valor</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {_atributos.map((elemento) => (
+                  <Tr key={Object.keys(elemento)[0]}>
+                    <Td>{Object.keys(elemento)[0]}</Td>
+                    <Td>
+                      <Tag>{Object.values(elemento)[0]}</Tag>
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </Stack>
+        </Stack>
+      </MainLayout>
     </ChakraProvider>
-  
   );
 };
 
 export default Punk;
-

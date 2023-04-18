@@ -10,10 +10,10 @@ import {
   Heading,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
-// import Link from "./nav-link";
-import Footer from "./footer";
-import WalletData from "./wallet-data";
 import Link from "next/link";
+import WalletData from "./wallet-data/wallet-data";
+import Footer from "./footer/footer";
+
 
 const Links = [
   {

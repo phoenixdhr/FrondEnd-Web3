@@ -4,39 +4,33 @@ import { useEffect, useState } from "react";
 import AbiAddress_NFTpunks from "@/hooks/useNFTpunks/artifacts/AbiAddress_NFTpunks";
 import { ethers } from "ethers";
 import { useToast } from '@chakra-ui/react'
+import { useRouter } from "next/router";
 
 const Home = () => {
 
-  const { status, address } = useAccount();
+  const {abi, addressContract } = AbiAddress_NFTpunks
+  const { status, address, isConnected } = useAccount();
+  const router = useRouter()
+
   const [_status, setstatus] = useState("");
-  const [_address, setaddress] = useState(address);
+  const [_address, setaddress] = useState("");
   const [imageSrc, setImageSrc] =useState("")
 
-
-
-  useEffect(() => {
-    setstatus(status);
-    setaddress(address);
-  }, [status, address]);
-
-  const {abi, addressContract } = AbiAddress_NFTpunks
   const [_totalSupply, setTotalSupply] = useState(0)
   const [_contractNFT, setContractNFT] = useState({})
 
   const toast = useToast()
 
-
   async function main () {
+        
                 const provider = new ethers.providers.Web3Provider(window.ethereum)
                 const signers = await provider.getSigner()
-                const Wallet = await signers.getAddress()
 
                 const contractNFT = new ethers.Contract(addressContract.sepolia1,abi,signers)
-                console.log("Wallet =>  ", Wallet);
                 
                 const totalSupplyBigN =  await contractNFT.totalSupply();
                 const totalSupply= Number(totalSupplyBigN);
-                const ADNr = await contractNFT.deterministicPsudoRandomADN(totalSupply, Wallet);
+                const ADNr = await contractNFT.deterministicPsudoRandomADN(totalSupply, _address);
                 const imagenURL = await contractNFT.getImagenURI(ADNr)
 
                 setImageSrc(imagenURL)
@@ -45,18 +39,15 @@ const Home = () => {
       
   }
 
-
   async function mint(){
     const provider = new ethers.providers.Web3Provider(window.ethereum)
     const signers = await provider.getSigner()
-    const Wallet =signers.getAddress()
 
     const contractNFT = new ethers.Contract(addressContract.sepolia1,abi,signers)
 
-
     try {
         
-        const txMint = await contractNFT.safeMint(Wallet)
+        const txMint = await contractNFT.safeMint({value: ethers.utils.parseEther('0.001')})
                 toast({
                     title: '',
                     description: `txHash ${txMint.hash}`,
@@ -73,8 +64,6 @@ const Home = () => {
                     status: 'success', 
                     duration: 3000,
                     isClosable: true,
-          
-
                 })
 
     } catch (error:any) {
@@ -89,21 +78,44 @@ const Home = () => {
                 
     }
     
-
-
-
-
   }
 
-
+  function toPunks() {
+    router.push("/punks")
+  }
 
   useEffect(() => {
-    
-    if(_status!=="disconnected"){
-        main()
+    setstatus(status);
+    setaddress(address);
+
+    if(_status=="disconnected" ){
     }    
-  }, [status])
+    
+    else{    
+      if(address){
+      main()}
+    }
+          
+  }, [status, address])
   
+
+
+
+  const [refreshData, set_refreshData] = useState(false); // 1. Nuevo estado
+  useEffect(() => {
+    if (router.isReady) {
+      set_refreshData(true);
+    }
+  }, [router]);
+
+  useEffect(() => {
+    if (refreshData) {
+      set_refreshData(false);
+      main();
+    }
+  }, [refreshData]);
+
+
 
 
   return (
@@ -133,7 +145,7 @@ const Home = () => {
               zIndex: -1,
             }}
           >
-            Un Platzi Punk
+            Un NFT Punk
           </Text>
           <br />
           <Text as={"span"} color={"green.400"}>
@@ -141,13 +153,13 @@ const Home = () => {
           </Text>
         </Heading>
         <Text color={"gray.500"}>
-          Platzi Punks es una colección de Avatares randomizados cuya metadata
+          NFT Punks es una colección de Avatares randomizados cuya metadata
           es almacenada on-chain. Poseen características únicas y sólo hay 10000
           en existencia.
         </Text>
         <Text color={"green.500"}>
-          Cada Platzi Punk se genera de forma secuencial basado en tu address,
-          usa el previsualizador para averiguar cuál sería tu Platzi Punk si
+          Cada NFT Punk se genera de forma secuencial basado en tu address,
+          usa el previsualizador para averiguar cuál sería tu NFT Punk si
           minteas en este momento
         </Text>
         <Stack
@@ -170,12 +182,15 @@ const Home = () => {
           </Button>
 
 
-          <Button rounded={"full"} size={"lg"} fontWeight={"normal"} px={6}>
+          <Button rounded={"full"} size={"lg"} fontWeight={"normal"} px={6} onClick={toPunks}>
             Galería
           </Button>
 
 
         </Stack>
+        <Text color={"green.8000"}>
+         COSTO DE MINT: 0.001 ETH
+         </Text>
       </Stack>
 
       <Flex
@@ -186,7 +201,7 @@ const Home = () => {
         position={"relative"}
         w={"full"}
       >
-        <Image src={_status=="connected" ? imageSrc : "https://avataaars.io/"} />
+        <Image src={_status!=="connected"? "https://avataaars.io/" : imageSrc} />
 
         {status ? (
           <>

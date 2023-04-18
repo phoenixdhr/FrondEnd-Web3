@@ -2,8 +2,9 @@ const AbiAddress_NFTpunks ={
     addressContract:{
         goerli1:"0xfE92dffC3b98133824A37eF1a0590a2B181339d6",
         goerli2:"0x85776e210F235Fa7568d099d4404fb242fA3a744",
-        sepolia1:"0x82f7D25E790fB01e4B1EE02292013D85cF54219e",
-        sepolia2:"0xD08Ca2793cc7C015Aa52141A6D5F0D3Bf07025fa"
+        sepolia1:"0xBAbe9a78ad4fc74d84C9b09655729a5a0007032D",
+        sepolia2:"0x2F57F9F2577C70d62EC6df043F2Bf6Ce958E91c7",
+        sepolia3:"0x82f7D25E790fB01e4B1EE02292013D85cF54219e"
     },
     abi: [
       {
@@ -322,7 +323,7 @@ const AbiAddress_NFTpunks ={
         "inputs": [],
         "name": "safeMint",
         "outputs": [],
-        "stateMutability": "nonpayable",
+        "stateMutability": "payable",
         "type": "function"
       },
       {
@@ -555,8 +556,21 @@ const AbiAddress_NFTpunks ={
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "withdraw",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
       }
-    ]
+    ],
 
 
 

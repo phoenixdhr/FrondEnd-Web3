@@ -1,45 +1,62 @@
-// MyComponent.jsx
-import React from 'react'
-import { useEffect, useState } from 'react'
+import React from "react";
+import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { ethers } from "ethers";
+import AbiAddress_NFTpunks from "@/hooks/useNFTpunks/artifacts/AbiAddress_NFTpunks";
+import { useProvider } from "wagmi";
+import { Badge } from "@chakra-ui/react";
 
-// Make sure that this component is wrapped with ConnectKitProvider
 const Balance = () => {
+  const { address, status } = useAccount();
+  const [_address, setAddress] = useState(address);
+  const [_status, setStatus] = useState(status);
+  const [_balance, setBalance] = useState(0);
+  const [_maxSupply, set_maxSupply] = useState(0);
+  const [_Supply, set_Supply] = useState(0);
 
-  const { address, status } =  useAccount();
-  const [_address, setAddress] = useState(address)
-  const [_status,  setStatus] = useState(status)
-  const [_balance, setBalance] =useState(0)
+  const { abi, addressContract } = AbiAddress_NFTpunks;
 
+  const provider = useProvider();
 
+  useEffect(() => {
+    setAddress(address);
+    setStatus(status);
 
-  useEffect(() => {      
-    
-    setAddress(address)
-    setStatus(status)
+    async function main() {
+      const contractNFT = new ethers.Contract(
+        addressContract.sepolia1,
+        abi,
+        provider
+      );
 
-    async function balance () {
-      const provider = new ethers.providers.Web3Provider(window.ethereum)
-        const bal = await provider.getBalance(address)
-        const balanceFormat = ethers.utils.formatEther(bal).slice(0,5)
-        setBalance(balanceFormat)
+      const bal = await provider.getBalance(address);
+      const balanceFormat = ethers.utils.formatEther(bal).slice(0, 5);
+      setBalance(balanceFormat);
+
+      const maxSupply = Number(await contractNFT.maxSupply());
+      set_maxSupply(maxSupply);
+
+      const totalSupply = Number(await contractNFT.totalSupply());
+
+      set_Supply(totalSupply);
     }
 
-    if (address) {balance()}    
+    if (address) {
+      main();
+    }
+  }, [status, provider]);
 
-
-    }, [status, address]) 
-
-
-  if (_status!="connected") 
-  {return (<div> {_status}</div>);}
-
-
-  return (<div>
-    {/* <div> Connected Wallet:  {address? "" : address.slice(0,6) + "..." +address.slice(38,42) } </div> */}
-    <div> Balance:  {_balance} </div>
-  </div>);
+  if (_status !== "connected") {
+    return <div> <Badge>Total Supply NFT : <Badge  ml={1} colorScheme="blue">{_Supply}  </Badge> </Badge></div>;
+  } else {
+    return (
+      <div>
+        <div> <Badge>Mi Balance       : <Badge  ml={1} colorScheme="blue">{_balance} ETH </Badge></Badge> </div>
+        <div> <Badge>Max Supply NFT   : <Badge  ml={1} colorScheme="blue">{_maxSupply}  </Badge> </Badge></div>
+        <div> <Badge>Total Supply NFT : <Badge  ml={1} colorScheme="blue">{_Supply}  </Badge> </Badge></div>
+      </div>
+    );
+  }
 };
 
-export default Balance
+export default Balance;

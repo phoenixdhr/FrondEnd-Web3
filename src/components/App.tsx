@@ -1,4 +1,3 @@
-
 import React from "react";
 import { configureChains} from 'wagmi'
 import { WagmiConfig, createClient } from "wagmi";
@@ -6,29 +5,21 @@ import { ConnectKitProvider, ConnectKitButton, getDefaultClient } from "connectk
 import { mainnet,goerli, polygon, optimism, sepolia } from 'wagmi/chains'
 import { publicProvider } from 'wagmi/providers/public'
 
-
 const {chains, provider} = configureChains([sepolia, goerli, polygon, mainnet, optimism], [publicProvider()])
-
-// const alchemyId = process.env.ALCHEMY_ID;
-
+  
 const client = createClient( getDefaultClient({
-																			autoConnect:true,
-																	    appName: "Your App Name",
-																	    chains,
-																			provider,
-																	  }),
-																	);
-
-
-
+                                      autoConnect:true,
+                                      appName: "Your App Name",
+                                      chains,
+                                      provider,
+                                    }),
+                                  );
 
 const App = () => {
-
 
   return (
     <WagmiConfig client={client}>
       <ConnectKitProvider>
-        my-App
         <ConnectKitButton />
       </ConnectKitProvider>
     </WagmiConfig>

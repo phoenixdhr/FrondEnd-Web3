@@ -1,8 +1,16 @@
 import React from "react";
-import { useState, useEffect } from "react";
-import Balance from "@/components/Balance";
 import { ChakraProvider } from "@chakra-ui/react";
+import MainLayout from "@/layouts/main/mainLayout";
+import { ethers } from "ethers";
+import { useRouter } from "next/router";
+import AbiAddress_NFTpunks from "@/hooks/useNFTpunks/artifacts/AbiAddress_NFTpunks";
+import { useAccount } from "wagmi";
+import { useState, useEffect } from "react";
+import { useProvider } from "wagmi";
+import PunkCard from "@/components2/punk-card/punk-card";
+import Link from "next/link";
 import { Grid } from "@chakra-ui/react";
+
 import {
   InputGroup,
   InputLeftElement,
@@ -13,32 +21,30 @@ import {
   FormControl,
 } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
-import MainLayout from "../layouts/main/mainLayout";
-import { useAccount } from "wagmi";
-import RequestAccess from "@/components2/request-access/request-access";
-import Loading from "@/components2/loading/loading";
-import { ethers } from "ethers";
-import AbiAddress_NFTpunks from "@/hooks/useNFTpunks/artifacts/AbiAddress_NFTpunks";
-import { useProvider } from "wagmi";
-import PunkCard from "@/components2/punk-card/punk-card";
-import { useRouter } from "next/router";
 
-import Link from "next/link";
-
-function Punks() {
-  const { abi, addressContract } = AbiAddress_NFTpunks;
-  const { status, address } = useAccount();
+function MyPunks() {
+  const router = useRouter();
   const provider = useProvider();
+
+  const address = router.query.address;
+
+  const { status } = useAccount();
+  const { abi, addressContract } = AbiAddress_NFTpunks;
+
   const [_status, set_status] = useState(status || "not connected");
+
+  const [_address, set_address] = useState(address);
   const [_dataApi, set_dataApi] = useState([]);
 
   const [_addressToId, set_addressToId] = useState("");
   const [_submitted, set_submitted] = useState(false);
   const [_validAddress, set_validAddress] = useState(false);
 
-  const router = useRouter();
+  const [refreshData, set_refreshData] = useState(false); // 1. Nuevo estado
 
   async function main() {
+    const address = router.query.address;
+    set_address(address);
 
     const contractNFT = new ethers.Contract(
       addressContract.sepolia1,
@@ -46,12 +52,23 @@ function Punks() {
       provider
     );
 
-    const totalSupply = Number(await contractNFT.totalSupply());
+    const balanceOf = Number(await contractNFT.balanceOf(_address));
+
+    const myIDs = [];
+
+    if (balanceOf > 0) {
+      for (let index = 0; index < balanceOf; index++) {
+        const element = Number(
+          await contractNFT.tokenOfOwnerByIndex(_address, index)
+        );
+        myIDs.push(element);
+      }
+    }
 
     const dataApi = [];
-    if (totalSupply > 0) {
-      for (let index = 0; index < totalSupply; index++) {
-        const base64URL = await contractNFT.tokenURI(index);
+    if (myIDs.length > 0) {
+      for (let index = 0; index < myIDs.length; index++) {
+        const base64URL = await contractNFT.tokenURI(myIDs[index]);
 
         const base64 = base64URL.split(",")[1];
         const dataNFT = atob(base64);
@@ -62,11 +79,6 @@ function Punks() {
       set_dataApi(dataApi);
     }
   }
-
-
-  useEffect(() => {
-    main();
-  }, [_dataApi.length]);
 
   function handleAddressChange(event) {
     const addresstoFind = event?.target.value;
@@ -83,19 +95,35 @@ function Punks() {
 
     if (res) {
       set_validAddress(true);
-
       router.push(`/address/${_addressToId}`);
+      set_address(_addressToId);
     } else {
       set_validAddress(false);
     }
   }
 
+  useEffect(() => {
+    set_status(status);
+    main();
+  }, [status, _address]);
+
+  useEffect(() => {
+    if (router.isReady) {
+      // 2. Efecto para actualizar el estado de _dataApi
+      set_refreshData(true);
+    }
+  }, [router]);
+
+  useEffect(() => {
+    if (refreshData) {
+      set_refreshData(false);
+      main();
+    }
+  }, [refreshData]);
 
   return (
     <ChakraProvider>
       <MainLayout>
-        <Balance />
-
         <form onSubmit={submit}>
           <FormControl>
             <InputGroup mb={3}>
@@ -126,11 +154,8 @@ function Punks() {
           </FormControl>
         </form>
 
-        {status !== "connected" && _status=="connecting" ? <RequestAccess /> : ""}
-
-
         <Grid templateColumns="repeat(auto-fill, minmax(250px,1fr))" gap={6}>
-          {status == "connected"
+          {status == "connected" && _address
             ? _dataApi.map((Element) => (
                 <Link key={Element.tokenID} href={`/punks/${Element.tokenID}`}>
                   <PunkCard
@@ -146,4 +171,4 @@ function Punks() {
   );
 }
 
-export default Punks;
+export default MyPunks;
