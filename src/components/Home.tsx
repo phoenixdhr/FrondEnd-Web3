@@ -145,11 +145,12 @@ const Home = () => {
               zIndex: -1,
             }}
           >
-            Un NFT Punk
+            NFT Punk
           </Text>
           <br />
           <Text as={"span"} color={"green.400"}>
-            nunca para de aprender
+            
+            nunca muere
           </Text>
         </Heading>
         <Text color={"gray.500"}>

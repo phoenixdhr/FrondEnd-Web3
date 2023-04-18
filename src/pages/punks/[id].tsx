@@ -49,7 +49,6 @@ const Punk = () => {
     );
 
     const totalSupply = Number(await contractNFT.totalSupply());
-    console.log("totalSupply =>", totalSupply);
 
     if (totalSupply >= tokenId) {
       const owner = await contractNFT.ownerOf(tokenId);
@@ -70,7 +69,6 @@ const Punk = () => {
       const efe = "sdfsf";
       efe.substring(0, 2);
       const stringAtributos = URLimage.slice(22).split("&");
-      console.log("atributor  ==>", stringAtributos);
       // set_atributos
 
       const arrayDeAtributos: { [key: string]: string }[] = stringAtributos.map(
@@ -81,11 +79,9 @@ const Punk = () => {
       );
       set_atributos(arrayDeAtributos);
 
-      console.log("arrayDeObjetos  ", arrayDeAtributos);
     }
 
-    console.log("_IDataNFT =====>", _IDataNFT);
-    console.log("_IDataNFT =====>", _IDataNFT.image);
+
   }
 
   useEffect(() => {
@@ -166,7 +162,7 @@ const Punk = () => {
   return (
     <ChakraProvider>
       <MainLayout>
-        hola
+        
         {status !== "connected" ? <RequestAccess /> : ""}
         <Stack
           spacing={{ base: 8, md: 10 }}

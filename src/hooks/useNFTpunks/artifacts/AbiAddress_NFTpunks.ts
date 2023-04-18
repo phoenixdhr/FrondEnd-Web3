@@ -2,7 +2,7 @@ const AbiAddress_NFTpunks ={
     addressContract:{
         goerli1:"0xfE92dffC3b98133824A37eF1a0590a2B181339d6",
         goerli2:"0x85776e210F235Fa7568d099d4404fb242fA3a744",
-        sepolia1:"0xBAbe9a78ad4fc74d84C9b09655729a5a0007032D",
+        sepolia1:"0x61D23e19998093286EbdC138baf523205CA2f319",
         sepolia2:"0x2F57F9F2577C70d62EC6df043F2Bf6Ce958E91c7",
         sepolia3:"0x82f7D25E790fB01e4B1EE02292013D85cF54219e"
     },
