@@ -26,5 +26,8 @@
     "react-dom": "18.2.0",
     "typescript": "5.0.4",
     "wagmi": "^0.12.10"
+  },
+  "devDependencies": {
+    "@ethersproject/providers": "^5.7.2"
   }
 }

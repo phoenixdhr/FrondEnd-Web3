@@ -13,6 +13,7 @@ import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import Link from "next/link";
 import WalletData from "./wallet-data/wallet-data";
 import Footer from "./footer/footer";
+import { ReactNode } from 'react';
 
 
 const Links = [
@@ -26,7 +27,7 @@ const Links = [
   },
 ];
 
-const MainLayout = ({ children }) => {
+const MainLayout = ({ children }: { children: ReactNode }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (

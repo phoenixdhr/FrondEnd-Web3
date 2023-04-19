@@ -25,12 +25,22 @@ import { useRouter } from "next/router";
 
 import Link from "next/link";
 
+
+
+
 function Punks() {
+
+  type tElementoApi ={
+    "name":string,
+    "tokenID":string,
+    "descipcion":string,
+    "image":string
+  }
   const { abi, addressContract } = AbiAddress_NFTpunks;
   const { status, address } = useAccount();
   const provider = useProvider();
   const [_status, set_status] = useState(status || "not connected");
-  const [_dataApi, set_dataApi] = useState([]);
+  const [_dataApi, set_dataApi] = useState<tElementoApi[]>([]);
 
   const [_addressToId, set_addressToId] = useState("");
   const [_submitted, set_submitted] = useState(false);
@@ -68,14 +78,14 @@ function Punks() {
     main();
   }, [_dataApi.length]);
 
-  function handleAddressChange(event) {
+  function handleAddressChange(event:React.ChangeEvent<HTMLInputElement>) {
     const addresstoFind = event?.target.value;
     set_addressToId(addresstoFind);
     set_submitted(false);
     set_validAddress(false);
   }
 
-  function submit(event) {
+  function submit(event:React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const res = ethers.utils.isAddress(_addressToId);
 
@@ -131,11 +141,12 @@ function Punks() {
 
         <Grid templateColumns="repeat(auto-fill, minmax(250px,1fr))" gap={6}>
           {status == "connected"
-            ? _dataApi.map((Element) => (
-                <Link key={Element.tokenID} href={`/punks/${Element.tokenID}`}>
+            ? _dataApi.map((Element:tElementoApi) => (
+                <Link key={Element.tokenID} href={`/punks/${Element.tokenID}`} type="string">
                   <PunkCard
                     image={Element.image}
                     name={Element.name}
+                    
                   ></PunkCard>
                 </Link>
               ))

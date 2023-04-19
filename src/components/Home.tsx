@@ -5,6 +5,8 @@ import AbiAddress_NFTpunks from "@/hooks/useNFTpunks/artifacts/AbiAddress_NFTpun
 import { ethers } from "ethers";
 import { useToast } from '@chakra-ui/react'
 import { useRouter } from "next/router";
+import { ExternalProvider } from "@ethersproject/providers";
+
 
 const Home = () => {
 
@@ -13,7 +15,7 @@ const Home = () => {
   const router = useRouter()
 
   const [_status, setstatus] = useState("");
-  const [_address, setaddress] = useState("");
+  const [_address, setaddress] = useState(address);
   const [imageSrc, setImageSrc] =useState("")
 
   const [_totalSupply, setTotalSupply] = useState(0)
@@ -23,24 +25,29 @@ const Home = () => {
 
   async function main () {
         
-                const provider = new ethers.providers.Web3Provider(window.ethereum)
-                const signers = await provider.getSigner()
+    if(typeof window.ethereum !== 'undefined' ){
 
-                const contractNFT = new ethers.Contract(addressContract.sepolia1,abi,signers)
-                
-                const totalSupplyBigN =  await contractNFT.totalSupply();
-                const totalSupply= Number(totalSupplyBigN);
-                const ADNr = await contractNFT.deterministicPsudoRandomADN(totalSupply, _address);
-                const imagenURL = await contractNFT.getImagenURI(ADNr)
+      const provider = new ethers.providers.Web3Provider(window.ethereum as unknown as ExternalProvider)
+      const signers = await provider.getSigner()
 
-                setImageSrc(imagenURL)
-                setTotalSupply(Number(totalSupply))
-                setContractNFT(contractNFT)      
+      const contractNFT = new ethers.Contract(addressContract.sepolia1,abi,signers)
       
+      const totalSupplyBigN =  await contractNFT.totalSupply();
+      const totalSupply= Number(totalSupplyBigN);
+      const ADNr = await contractNFT.deterministicPsudoRandomADN(totalSupply, _address);
+      const imagenURL = await contractNFT.getImagenURI(ADNr)
+
+      setImageSrc(imagenURL)
+      setTotalSupply(Number(totalSupply))
+      setContractNFT(contractNFT)      
+
+    }
   }
 
   async function mint(){
-    const provider = new ethers.providers.Web3Provider(window.ethereum)
+   if (typeof window.ethereum !== 'undefined' ){
+
+    const provider = new ethers.providers.Web3Provider(window.ethereum as unknown as ExternalProvider)
     const signers = await provider.getSigner()
 
     const contractNFT = new ethers.Contract(addressContract.sepolia1,abi,signers)
@@ -77,6 +84,8 @@ const Home = () => {
                 })
                 
     }
+   }
+
     
   }
 

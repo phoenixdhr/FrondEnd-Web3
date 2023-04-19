@@ -6,7 +6,14 @@ import {
   Image,
 } from "@chakra-ui/react";
 
-const PunkCard = ({ image, name, ...props }) => {
+
+type tElementoApi ={
+  "name":string,
+  "image":string
+}
+
+
+const PunkCard = ({ image, name, ...props }:tElementoApi) => {
   return (
     <Box
       role={"group"}

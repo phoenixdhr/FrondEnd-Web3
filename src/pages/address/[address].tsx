@@ -22,6 +22,15 @@ import {
 } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
 
+
+
+type ttElementoApi ={
+  "name":string,
+  "tokenID":string,
+  "description":string,
+  "image":string
+}
+
 function MyPunks() {
   const router = useRouter();
   const provider = useProvider();
@@ -34,7 +43,7 @@ function MyPunks() {
   const [_status, set_status] = useState(status || "not connected");
 
   const [_address, set_address] = useState(address);
-  const [_dataApi, set_dataApi] = useState([]);
+  const [_dataApi, set_dataApi] = useState<ttElementoApi[]>([]);
 
   const [_addressToId, set_addressToId] = useState("");
   const [_submitted, set_submitted] = useState(false);
@@ -80,14 +89,14 @@ function MyPunks() {
     }
   }
 
-  function handleAddressChange(event) {
+  function handleAddressChange(event:React.ChangeEvent<HTMLInputElement>) {
     const addresstoFind = event?.target.value;
     set_addressToId(addresstoFind);
     set_submitted(false);
     set_validAddress(false);
   }
 
-  function submit(event) {
+  function submit(event:React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const res = ethers.utils.isAddress(_addressToId);
 
