@@ -165,7 +165,7 @@ const Home = () => {
         <Text color={"gray.500"}>
           NFT Punks es una colección de Avatares randomizados cuya metadata
           es almacenada on-chain. Poseen características únicas y sólo hay 10000
-          en existencia.
+          en existencia. NFT Punks work with  <strong>Ethereum Sepolia Network.</strong>
         </Text>
         <Text color={"green.500"}>
           Cada NFT Punk se genera de forma secuencial basado en tu address,

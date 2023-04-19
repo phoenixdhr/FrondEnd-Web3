@@ -28,6 +28,8 @@
     "wagmi": "^0.12.10"
   },
   "devDependencies": {
-    "@ethersproject/providers": "^5.7.2"
+    "@ethersproject/providers": "^5.7.2",
+    "@types/dotenv": "^8.2.0",
+    "dotenv": "^16.0.3"
   }
 }
