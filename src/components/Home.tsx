@@ -11,11 +11,11 @@ import { ExternalProvider } from "@ethersproject/providers";
 const Home = () => {
 
   const {abi, addressContract } = AbiAddress_NFTpunks
-  const { status, address, isConnected } = useAccount();
+  const {status, address, isConnected } = useAccount();
   const router = useRouter()
 
   const [_status, setstatus] = useState("");
-  const [_address, setaddress] = useState(address);
+  const [_address, setaddress] = useState<string | undefined>(undefined);
   const [imageSrc, setImageSrc] =useState("")
 
   const [_totalSupply, setTotalSupply] = useState(0)
@@ -23,25 +23,28 @@ const Home = () => {
 
   const toast = useToast()
 
+  
+
   async function main () {
-        
-    if(typeof window.ethereum !== 'undefined' ){
 
-      const provider = new ethers.providers.Web3Provider(window.ethereum as unknown as ExternalProvider)
-      const signers = await provider.getSigner()
+        if(_address!=undefined){
 
-      const contractNFT = new ethers.Contract(addressContract.sepolia1,abi,signers)
+          const provider = new ethers.providers.Web3Provider(window.ethereum as unknown as ExternalProvider)
+
+          const signers = await provider.getSigner()
+          const contractNFT =await new ethers.Contract(addressContract.sepolia1,abi,signers)
+          const totalSupplyBigN =  await contractNFT.totalSupply();
+          const totalSupply= await Number(totalSupplyBigN);
+          const ADNr = await contractNFT.deterministicPsudoRandomADN(totalSupply, _address);
+          const imagenURL = await contractNFT.getImagenURI(ADNr)
+
+          setImageSrc(imagenURL)
+
+          setTotalSupply(Number(totalSupply))
+          setContractNFT(contractNFT)      
       
-      const totalSupplyBigN =  await contractNFT.totalSupply();
-      const totalSupply= Number(totalSupplyBigN);
-      const ADNr = await contractNFT.deterministicPsudoRandomADN(totalSupply, _address);
-      const imagenURL = await contractNFT.getImagenURI(ADNr)
+        }
 
-      setImageSrc(imagenURL)
-      setTotalSupply(Number(totalSupply))
-      setContractNFT(contractNFT)      
-
-    }
   }
 
   async function mint(){
@@ -77,7 +80,7 @@ const Home = () => {
                         
         toast({
                     title: 'Error',
-                    description: `${error.code}`,
+                    description: `${error.code} revisa tu balance de ETH en la red de Sepolia`,
                     status: 'error', 
                     duration: 2000,
                     isClosable: true,
@@ -93,29 +96,33 @@ const Home = () => {
     router.push("/punks")
   }
 
+
   useEffect(() => {
     setstatus(status);
-    setaddress(address);
-
-    if(_status=="disconnected" ){
-    }    
+    setaddress(address)
     
-    else{    
-      if(address){
-      main()}
+    if(address!==undefined || _address!==undefined){
+      main()
     }
-          
-  }, [status, address])
-  
+   }, [status, address, _address])
+
+
+
+
 
 
 
   const [refreshData, set_refreshData] = useState(false); // 1. Nuevo estado
+
+
   useEffect(() => {
     if (router.isReady) {
       set_refreshData(true);
     }
   }, [router]);
+
+
+
 
   useEffect(() => {
     if (refreshData) {
@@ -211,7 +218,7 @@ const Home = () => {
         position={"relative"}
         w={"full"}
       >
-        <Image src={_status!=="connected"? "https://avataaars.io/" : imageSrc} />
+        <Image src={imageSrc=="" ? "https://avataaars.io/" : imageSrc} alt="NFT basico" />
 
         {status ? (
           <>
