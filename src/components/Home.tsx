@@ -206,7 +206,7 @@ const Home = () => {
 
         </Stack>
         <Text color={"green.8000"}>
-         COSTO DE MINT: 0.001 ETH
+          <b>COSTO DE MINT: 0.001 ETH</b> 
          </Text>
       </Stack>
 
