@@ -174,7 +174,9 @@ function MyPunks() {
                 </Link>
               ))
             : ""}
+           
         </Grid>
+        {(status == "connected" && _address)&&_dataApi.length==0 && <b> Esta Address {_address} no tiene NFTPunks</b>}
       </MainLayout>
     </ChakraProvider>
   );
