@@ -1,8 +1,8 @@
 **URL**
 
-Proyecto desplegado en [VERCEL](https://frond-end-web3-h56vdh5fu-phoenixdhr.vercel.app/)
+- Proyecto desplegado en [VERCEL](https://frond-end-web3-h56vdh5fu-phoenixdhr.vercel.app/)
 
-Proyecto desplegado en [IPFS](https://bafybeiaq7k75wdla76fxc3zfaf7r7lc5d2hvuamuzyboiondna6ax4wffm.ipfs.dweb.link/)
+- Proyecto desplegado en [IPFS](https://bafybeiaq7k75wdla76fxc3zfaf7r7lc5d2hvuamuzyboiondna6ax4wffm.ipfs.dweb.link/)
 
 **DESCRIPCION**
 
