@@ -1,3 +1,14 @@
+**URL**
+Proyecto desplegado en VERCEL https://frond-end-web3-h56vdh5fu-phoenixdhr.vercel.app/
+Proyecto desplegado en IPFS https://bafybeiaq7k75wdla76fxc3zfaf7r7lc5d2hvuamuzyboiondna6ax4wffm.ipfs.dweb.link/
+
+**DESCRIPCION**
+
+NFT Punks es una colección de Avatares randomizados cuya metadata es almacenada on-chain. Poseen características únicas y sólo hay 10000 en existencia. NFT Punks trabaje en la red de prueba Sepolia de Ethereum.
+
+
+
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
